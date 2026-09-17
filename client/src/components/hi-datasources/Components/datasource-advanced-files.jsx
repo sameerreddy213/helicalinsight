@@ -8,7 +8,6 @@ import {
   QuestionCircleOutlined,
 } from "@ant-design/icons";
 import {
-  setButtonType,
   setFileBrowserFolder,
 } from "../../../redux/actions/datasource.actions";
 import { useEffect, useRef } from "react";
@@ -27,6 +26,7 @@ const DataSourceAdvancedFiles = (props) => {
     setEditorInput = false,
     checkIfGroovyPlain = () => { },
     checkIfGroovyManaged = () => { },
+    onButtonAction,
   } = props;
   const dispatch = useDispatch();
   const clickedActiveDatabaseData = useSelector(
@@ -193,9 +193,7 @@ const DataSourceAdvancedFiles = (props) => {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    dispatch(
-                      setButtonType({ type: "test", datasourceType: "efwd" })
-                    )
+                    onButtonAction({ type: "test", datasourceType: "efwd" })
                   }
                 >
                   Test Connection
@@ -207,9 +205,7 @@ const DataSourceAdvancedFiles = (props) => {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    dispatch(
-                      setButtonType({ type: "save", datasourceType: "efwd" })
-                    )
+                    onButtonAction({ type: "save", datasourceType: "efwd" })
                   }
                 >
                   {editable ? "Update Datasource" : "Save Datasource"}

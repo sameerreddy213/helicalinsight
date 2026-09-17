@@ -15,6 +15,7 @@ import {
   setDataSourceConnection,
   setSelectedDriverInfo,
   setViewData,
+  setButtonType,
 } from "../../../redux/actions/datasource.actions";
 import { getCreateEditFD } from "../utils/getCreateEditFD";
 import { checkIfGroovyManaged } from "../utils/checkIfGroovyManaged";
@@ -53,6 +54,17 @@ const DataSourceCreateAndEdit = (props) => {
   const editData = useSelector((store) => store.datasource.editData);
   const viewData = useSelector((store) => store.datasource.viewData);
   const buttonTypes = useSelector((store) => store.datasource.buttonTypes);
+  // Synchronous copy of the last Test/Save click. Form onFinish runs in the same
+  // event turn as the button onClick, before Redux re-renders, so reading
+  // buttonTypes from the store alone can reuse the previous action (e.g. Save
+  // after Test still calling the test service).
+  const buttonActionRef = useRef(buttonTypes);
+  const onButtonAction = (action) => {
+    buttonActionRef.current = action;
+    dispatch(setButtonType(action));
+  };
+  const resolveButtonTypes = () =>
+    buttonActionRef.current?.type ? buttonActionRef.current : buttonTypes;
   const selectedDriverInfo = useSelector(
     (store) => store.datasource.selectedDriverInfo
   );
@@ -474,7 +486,8 @@ const DataSourceCreateAndEdit = (props) => {
     }
   }, [clickedActiveDatabaseData, selectedDriverInfo, editData]);
   const handleFormSubmit = (values) => {
-    const { type, datasourceType } = buttonTypes;
+    const activeButtonTypes = resolveButtonTypes();
+    const { type, datasourceType } = activeButtonTypes;
 
     const config = configEditorValueRef?.current
       ? JSON.parse(configEditorValueRef?.current)
@@ -493,7 +506,7 @@ const DataSourceCreateAndEdit = (props) => {
     let saveUri = "core/dataSource/write";
     let updateUri = "core/dataSource/update";
     let formData = getCreateEditFD({
-      buttonTypes,
+      buttonTypes: activeButtonTypes,
       values,
       clickedActiveDatabaseData,
       editorInput,
@@ -790,7 +803,8 @@ const DataSourceCreateAndEdit = (props) => {
   };
 
   const confirmSubmit = (values) => {
-    if (!editable && buttonTypes?.type === "save" && clickedDSUrls?.length > 1) {
+    const activeButtonTypes = resolveButtonTypes();
+    if (!editable && activeButtonTypes?.type === "save" && clickedDSUrls?.length > 1) {
       Modal.confirm({
         title: 'Do you confirm all the details are correct and you want to submit?',
         okText: 'Yes',
@@ -1068,7 +1082,7 @@ const DataSourceCreateAndEdit = (props) => {
           {(dataSourceProvider ||
             clickedActiveDatabaseData.categoryType === "advanced") &&
             (dataSourceProvider === "jndi" ? (
-              <DataSourceJNDIFiles editable={editable} />
+              <DataSourceJNDIFiles editable={editable} onButtonAction={onButtonAction} />
             ) : (
               <>
                 <DataSourceDefaultFiles
@@ -1090,12 +1104,14 @@ const DataSourceCreateAndEdit = (props) => {
                   WrappedConfigEditor={WrappedConfigEditor}
                   CodeEditorTab={CodeEditorTab}
                   setUploadFileName={setUploadFileName}
+                  onButtonAction={onButtonAction}
                 />
                 <DataSourceFlatFiles
                   editable={editable}
                   driverCategory={driverCategory}
                   testConnClick={testConnClick}
                   saveConnClick={saveConnClick}
+                  onButtonAction={onButtonAction}
                 />
                 {clickedActiveDatabaseData.categoryName === "advanced" &&
                   !editable && (
@@ -1109,6 +1125,7 @@ const DataSourceCreateAndEdit = (props) => {
                       editorInput={editorInput}
                       checkIfGroovyPlain={checkIfGroovyPlain}
                       checkIfGroovyManaged={checkIfGroovyManaged}
+                      onButtonAction={onButtonAction}
                     />
                   )}
                 {clickedActiveDatabaseData.categoryName === "advanced" &&
@@ -1124,6 +1141,7 @@ const DataSourceCreateAndEdit = (props) => {
                       editorInput={editorInput}
                       checkIfGroovyPlain={checkIfGroovyPlain}
                       checkIfGroovyManaged={checkIfGroovyManaged}
+                      onButtonAction={onButtonAction}
                     />
                   )}
               </>

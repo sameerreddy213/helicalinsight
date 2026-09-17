@@ -164,6 +164,10 @@ driverListArray.each {
         if(it.driver=="com.helical.FlatFileDriver") {
             modelJson.name=findDbName="Flatfile"
         }
+        boolean isHelicalMongo = (it.driver=="com.helical.mongodb.MongoJdbcDriver")
+        if(isHelicalMongo) {
+            modelJson.name=findDbName="Mongodb"
+        }
 
 
         for (int i = 0; i < clonedSupportedFilesObject.size(); i++) {
@@ -178,7 +182,12 @@ driverListArray.each {
 
         String middleWareName = JsonUtils.getHiMiddleWareName();
         def modifiedMiddlewareName = prepareDbName(middleWareName)
-        if (findDbName.equals("Hive") || findDbName.equals("Apache Drill")) {
+        if (isHelicalMongo) {
+            modelJson.categoryName = "No SQL & Big Data"
+            modelJson.categoryType = "nosql_bigdata"
+            modelJson.type = "global.jdbc"
+            modelJson.dataSourceProvider = "tomcat"
+        } else if (findDbName.equals("Hive") || findDbName.equals("Apache Drill")) {
             modelJson.categoryName = "Big Data"
             modelJson.categoryType = "big_data"
 

@@ -148,3 +148,11 @@ instantbi/**/.idea/workspace.xml
 /instantbi/**/.idea
 server/**/.flattened-pom.xml
 *.lock
+
+# Local tooling and generated demo files
+.codex/
+.claude/
+.agents/
+AGENTS.md
+CLAUDE.md
+docker/hi/

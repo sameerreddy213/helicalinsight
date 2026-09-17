@@ -1,0 +1,87 @@
+# Developer / reviewer stack: build React client + backend from this git checkout.
+# From the repository root:
+#   docker compose -f docker-compose.mongodb.yml up --build
+#
+# Then open http://localhost:8080/hi-ee/  (login: hiadmin / hiadmin)
+#
+# MongoDB demo service hostname inside this Compose network: mongodb
+# Example JDBC URL from the hiee container:
+#   mongodb://hi_mongo:hi_mongo_dev@mongodb:27017/hi_demo?authSource=admin
+
+services:
+  postgres:
+    image: postgres:15.8-alpine3.20
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-hiuser}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-hiuser}
+      POSTGRES_DB: ${POSTGRES_DB:-hiee}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./server/docker/init-scripts:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-hiuser} -d ${POSTGRES_DB:-hiee}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - hinet
+
+  mongodb:
+    image: mongo:7.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MONGO_PORT:-27017}:27017"
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: hi_mongo
+      MONGO_INITDB_ROOT_PASSWORD: hi_mongo_dev
+      MONGO_INITDB_DATABASE: hi_demo
+    volumes:
+      - ./docker/mongodb/init:/docker-entrypoint-initdb.d:ro
+      - hi_mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--quiet", "-u", "hi_mongo", "-p", "hi_mongo_dev", "--authenticationDatabase", "admin", "--eval", "db.runCommand({ ping: 1 }).ok"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - hinet
+
+  hiee:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      mongodb:
+        condition: service_healthy
+    environment:
+      HOST_IP: ${HOST_IP:-localhost}
+      HOST_PORT: ${HI_PORT:-8080}
+      INSTALL_CHROME: ${INSTALL_CHROME:-false}
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:8080/hi-ee/applicationSettings || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 90s
+    ports:
+      - "127.0.0.1:${HI_PORT:-8080}:8080"
+    volumes:
+      - hi_repository:/usr/local/Helical Insight/hi/hi-repository
+      - hi_db:/usr/local/Helical Insight/hi/db
+    networks:
+      - hinet
+
+networks:
+  hinet:
+    driver: bridge
+
+volumes:
+  pgdata:
+  hi_mongo_data:
+  hi_repository:
+  hi_db:

@@ -1,5 +1,18 @@
 # Helical Insight
 
+## MongoDB datasource
+
+This checkout adds MongoDB connectivity through Helical Insight's existing JDBC driver mechanism.
+
+```bash
+docker compose -f docker-compose.mongodb.yml up --build -d
+```
+
+Open http://localhost:8080/hi-ee/ (`hiadmin` / `hiadmin`). The stack builds the frontend, backend, and driver from source and starts MongoDB with sample data.
+
+[Setup, configuration, supported queries and limitations](docs/mongodb-setup.md) · [Verification](docs/verification.md)
+
+
 A Unified Open Source Enterprise Ready Embedded BI with AI Capabilities ~ providing all enterprise features in the open source free version.  
 
 [![GitHub release](https://img.shields.io/github/v/release/helicalinsight/helicalinsight)](https://github.com/helicalinsight/helicalinsight/releases)

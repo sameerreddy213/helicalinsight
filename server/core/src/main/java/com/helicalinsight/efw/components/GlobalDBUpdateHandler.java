@@ -198,9 +198,11 @@ public class GlobalDBUpdateHandler extends GlobalXmlUpdateHandler {
         JsonObject formDataJson = new Gson().fromJson(formData,JsonObject.class);
         Map<String, String> parameters = new HashMap<>();
 
-        String dataSourceProvider = formDataJson.get("dataSourceProvider").getAsString();
-        String id = formDataJson.get("id").getAsString();
-        String type = formDataJson.get("type").getAsString();
+        // Read required fields safely so missing UI/API parameters return a validation error
+        // instead of NullPointerException from JsonObject.get(...).getAsString().
+        String dataSourceProvider = GsonUtility.optString(formDataJson, "dataSourceProvider");
+        String id = GsonUtility.optString(formDataJson, "id");
+        String type = GsonUtility.optString(formDataJson, "type");
 
         parameters.put("id", id);
         parameters.put("type", type);

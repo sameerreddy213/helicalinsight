@@ -4,7 +4,6 @@ import { Row, Col, Form, Tooltip, Input, Button, Space, Progress } from "antd";
 import { PlusOutlined, QuestionCircleOutlined } from "@ant-design/icons";
 import {
   setFlatFilesUploadName,
-  setButtonType,
 } from "../../../redux/actions/datasource.actions";
 import requests from "../../../base/requests";
 import axios from "axios";
@@ -12,7 +11,7 @@ import notify from "../../hi-notifications/notify";
 import { v4 as uuidv4 } from "uuid";
 
 const DataSourceFlatFiles = (props) => {
-  const { editable, driverCategory, testConnClick, saveConnClick } = props;
+  const { editable, driverCategory, testConnClick, saveConnClick, onButtonAction } = props;
   const dispatch = useDispatch();
   const editData = useSelector((store) => store.datasource.editData);
   const clickedActiveDatabaseData = useSelector(
@@ -197,12 +196,10 @@ const DataSourceFlatFiles = (props) => {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    dispatch(
-                      setButtonType({
-                        type: "test",
-                        datasourceType: "flatfiles",
-                      })
-                    )
+                    onButtonAction({
+                      type: "test",
+                      datasourceType: "flatfiles",
+                    })
                   }
                 >
                   Test Connection
@@ -214,12 +211,10 @@ const DataSourceFlatFiles = (props) => {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    dispatch(
-                      setButtonType({
-                        type: "save",
-                        datasourceType: "flatfiles",
-                      })
-                    )
+                    onButtonAction({
+                      type: "save",
+                      datasourceType: "flatfiles",
+                    })
                   }
                 >
                   {editable ? "Update Datasource" : "Save Datasource"}

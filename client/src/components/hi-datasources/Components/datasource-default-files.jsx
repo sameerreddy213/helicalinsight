@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { Row, Col, Form, Tooltip, Input, Button, Space, Tabs } from "antd";
 import { useDispatch, useSelector } from "react-redux";
 import { LoadingOutlined, QuestionCircleOutlined } from "@ant-design/icons";
-import { setButtonType } from "../../../redux/actions/datasource.actions";
 import { decompile } from "../utils/decompile";
 import { checkIfGroovyManaged } from "../utils/checkIfGroovyManaged";
 import notify from "../../hi-notifications/notify";
@@ -40,6 +39,7 @@ const DataSourceDefaultFiles = (props) => {
     CodeEditorTab,
     WrappedConfigEditor,
     setUploadFileName,
+    onButtonAction,
   } = props;
   const dispatch = useDispatch();
 
@@ -436,9 +436,7 @@ const DataSourceDefaultFiles = (props) => {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    dispatch(
-                      setButtonType({ type: "test", datasourceType: "default" })
-                    )
+                    onButtonAction({ type: "test", datasourceType: "default" })
                   }
                 >
                   Test Connection
@@ -450,9 +448,7 @@ const DataSourceDefaultFiles = (props) => {
                   type="primary"
                   htmlType="submit"
                   onClick={() =>
-                    dispatch(
-                      setButtonType({ type: "save", datasourceType: "default" })
-                    )
+                    onButtonAction({ type: "save", datasourceType: "default" })
                   }
                 >
                   {editable ? "Update Datasource" : "Save Datasource"}

@@ -1,12 +1,10 @@
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
 import { Row, Col, Form, Tooltip, Input, Button, Space } from "antd";
 import { QuestionCircleOutlined } from "@ant-design/icons";
-import { setButtonType } from "../../../redux/actions/datasource.actions";
 import { v4 as uuidv4 } from "uuid";
 
 const DataSourceJNDIFiles = (props) => {
-  const { editable } = props;
-  const dispatch = useDispatch();
+  const { editable, onButtonAction } = props;
   const editData = useSelector((store) => store.datasource.editData);
   const dataSourceEditName = editData["@name"];
 
@@ -47,7 +45,7 @@ const DataSourceJNDIFiles = (props) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                onClick={() => dispatch(setButtonType({ type: "test", datasourceType: "jndi" }))}
+                onClick={() => onButtonAction({ type: "test", datasourceType: "jndi" })}
               >
                 Test Connection
               </Button>
@@ -56,7 +54,7 @@ const DataSourceJNDIFiles = (props) => {
               <Button
                 type="primary"
                 htmlType="submit"
-                onClick={() => dispatch(setButtonType({ type: "save", datasourceType: "jndi" }))}
+                onClick={() => onButtonAction({ type: "save", datasourceType: "jndi" })}
               >
                 {editable ? "Update Datasource" : "Save Datasource"}
               </Button>
